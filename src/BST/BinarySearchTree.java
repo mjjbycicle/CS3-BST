@@ -17,6 +17,10 @@ public class BinarySearchTree<T extends Comparable<T>> {
     }
 
     public int height() {
+        return getLevels().size() - 1;
+    }
+
+    public int levels() {
         return getLevels().size();
     }
 
@@ -29,7 +33,7 @@ public class BinarySearchTree<T extends Comparable<T>> {
     }
 
     public int diameter() {
-        return getLevels(root.getLeft()).size() + getLevels(root.getRight()).size();
+        return getLevels(root.getLeft()).size() + getLevels(root.getRight()).size() + 1;
     }
 
     public int numLeaves() {
