@@ -73,7 +73,7 @@ public class BinaryNode<T extends Comparable<T>> {
 
         @Override
         public String toString() {
-            return "null";
+            return "--";
         }
     }
 }

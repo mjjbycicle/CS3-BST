@@ -4,16 +4,31 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class BinarySearchTree<T extends Comparable<T>> {
-    private final BinaryNode<T> root;
+    private BinaryNode<T> root;
 
     public enum Direction {
         LEFT, RIGHT
     }
 
-    public BinarySearchTree(T rootValue) {
-        this.root = new BinaryNode<>(rootValue, null, null);
+    public boolean contains(BinaryNode<T> root, T target) {
+        if (root.getData().equals(target)) {
+            return true;
+        } else if (target.compareTo(root.getData()) < 0) {
+            if (root.getLeft() == null) return false;
+            return contains(root.getLeft(), target);
+        } else if (target.compareTo(root.getData()) > 0) {
+            if (root.getRight() == null) return false;
+            return contains(root.getRight(), target);
+        }
+        return false;
+    }
+
+    public boolean contains(T target) {
+        if (root == null) return false;
+        return contains(root, target);
     }
 
     public int height() {
@@ -83,21 +98,24 @@ public class BinarySearchTree<T extends Comparable<T>> {
     }
 
     public void add(T value) {
-        BinaryNode<T> current = root;
-        while (true) {
-            if (value.compareTo(current.getData()) < 0) {
-                if (current.getLeft() == null) {
-                    current.setLeft(new BinaryNode<>(value, current, Direction.LEFT));
-                    break;
+        if (root == null) root = new BinaryNode<T>(value, null, null);
+        else {
+            BinaryNode<T> current = root;
+            while (true) {
+                if (value.compareTo(current.getData()) < 0) {
+                    if (current.getLeft() == null) {
+                        current.setLeft(new BinaryNode<>(value, current, Direction.LEFT));
+                        break;
+                    } else {
+                        current = current.getLeft();
+                    }
                 } else {
-                    current = current.getLeft();
-                }
-            } else {
-                if (current.getRight() == null) {
-                    current.setRight(new BinaryNode<>(value, current, Direction.RIGHT));
-                    break;
-                } else {
-                    current = current.getRight();
+                    if (current.getRight() == null) {
+                        current.setRight(new BinaryNode<>(value, current, Direction.RIGHT));
+                        break;
+                    } else {
+                        current = current.getRight();
+                    }
                 }
             }
         }
@@ -316,8 +334,11 @@ public class BinarySearchTree<T extends Comparable<T>> {
 
     public String toString() {
         StringBuilder res = new StringBuilder();
-        for (var i : getDisplayLevels()) {
-            res.append(i.toString()).append("\n");
+//        for (int ind = 0; ind <  Math.min(getDisplayLevels().size(), 6); ind++) {
+        for (int ind = 0; ind <  getDisplayLevels().size(); ind++) {
+            var i = getDisplayLevels().get(ind);
+            res.append(i.stream().map(BinaryNode::toString).collect(Collectors.joining((CharSequence) "|")));
+            res.append("\n");
         }
         return res.toString();
     }
