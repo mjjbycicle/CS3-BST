@@ -334,7 +334,6 @@ public class BinarySearchTree<T extends Comparable<T>> {
 
     public String toString() {
         StringBuilder res = new StringBuilder();
-//        for (int ind = 0; ind <  Math.min(getDisplayLevels().size(), 6); ind++) {
         for (int ind = 0; ind <  getDisplayLevels().size(); ind++) {
             var i = getDisplayLevels().get(ind);
             res.append(i.stream().map(BinaryNode::toString).collect(Collectors.joining((CharSequence) "|")));

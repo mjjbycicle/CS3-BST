@@ -1,7 +1,6 @@
 package RBT;
 
 import BST.BinaryNode;
-import BST.BinarySearchTree;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,8 +19,9 @@ public class RedBlackTree<T extends Comparable<T>> {
     private RedBlackNode<T> root;
 
     public void add(T value) {
-        if (root == null) root = new RedBlackNode<>(value, null);
-        else {
+        if (root == null) {
+            root = new RedBlackNode<>(value, null);
+        } else {
             RedBlackNode<T> current = root;
             while (true) {
                 if (current.getNumChildren() == 2) {
@@ -32,7 +32,9 @@ public class RedBlackTree<T extends Comparable<T>> {
                         current.getRight().swapColor();
                     }
                 }
-                if (current.getNumChildren() == 0) {
+                if (current.getNumChildren() == 0
+                        || (current.getData().compareTo(value) > 0 && current.getLeft() == null)
+                        || (current.getData().compareTo(value) < 0 && current.getRight() == null)) {
                     RedBlackNode<T> newNode = new RedBlackNode<>(value, current);
                     if (current.getData().compareTo(value) > 0) {
                         current.setLeft(newNode);
@@ -108,6 +110,7 @@ public class RedBlackTree<T extends Comparable<T>> {
         if (sibling != null)
             sibling.unlinkParent();
         node.unlinkParent();
+        parent.rawSetRight(null);
         grandParent.setLeft(parent);
         if (uncle != null)
             parent.setLeft(uncle);
@@ -122,12 +125,16 @@ public class RedBlackTree<T extends Comparable<T>> {
         RedBlackNode<T> leftChild = node.getLeft();
         parent.unlinkParent();
         node.unlinkParent();
+        parent.rawSetLeft(null);
         if (leftChild != null)
             leftChild.unlinkParent();
         grandParent.setLeft(node);
         node.setLeft(parent);
         if (leftChild != null)
             parent.setRight(leftChild);
+        node.setColor(Color.RED);
+        parent.setColor(Color.RED);
+        grandParent.setColor(Color.BLACK);
         leftLeftRotation(parent);
     }
 
@@ -143,6 +150,9 @@ public class RedBlackTree<T extends Comparable<T>> {
         node.setRight(parent);
         if (leftChild != null)
             parent.setLeft(leftChild);
+        node.setColor(Color.RED);
+        parent.setColor(Color.RED);
+        grandParent.setColor(Color.BLACK);
         rightRightRotation(parent);
     }
 
@@ -171,7 +181,58 @@ public class RedBlackTree<T extends Comparable<T>> {
         return result;
     }
 
+    public List<List<RedBlackNode<T>>> getDisplayLevels() {
+        List<List<RedBlackNode<T>>> result = new ArrayList<>();
+        List<RedBlackNode<T>> currentLevel = List.of(root);
+        while (true) {
+            result.add(currentLevel);
+            List<RedBlackNode<T>> newLevel = new ArrayList<>();
+            boolean added = false;
+            for (RedBlackNode<T> child : currentLevel) {
+                if (child.getLeft() != null) {
+                    newLevel.add(child.getLeft());
+                    added = true;
+                } else {
+                    newLevel.add(new RedBlackNode.NullNode());
+                }
+                if (child.getRight() != null) {
+                    newLevel.add(child.getRight());
+                    added = true;
+                } else {
+                    newLevel.add(new RedBlackNode.NullNode());
+                }
+            }
+            currentLevel = newLevel;
+            if (!added) {
+                break;
+            }
+        }
+        return result;
+    }
+
     public List<List<RedBlackNode<T>>> getLevels() {
         return getLevels(root);
     }
+
+    public static final String ANSI_RESET = "\u001B[0m";
+    public static final String ANSI_BLACK = "\u001B[30m";
+    public static final String ANSI_RED = "\u001B[31m";
+
+    public String toString() {
+        List<List<RedBlackNode<T>>> levels = getDisplayLevels();
+        StringBuilder sb = new StringBuilder();
+        for (var level : levels) {
+            for (RedBlackNode<T> node : level) {
+                sb.append(
+                        node.getColor() == Color.BLACK? ANSI_BLACK : ANSI_RED
+                );
+                sb.append(node.toString());
+                sb.append(ANSI_RESET);
+                sb.append(" ");
+            }
+            sb.append("\n");
+        }
+        return sb.toString();
+    }
+
 }

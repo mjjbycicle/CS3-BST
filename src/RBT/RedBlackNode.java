@@ -27,6 +27,10 @@ public class RedBlackNode<T extends Comparable<T>> {
         else this.color = RedBlackTree.Color.RED;
     }
 
+    public void setColor(RedBlackTree.Color color) {
+        this.color = color;
+    }
+
     public RedBlackNode<T> getParent() {
         return parent;
     }
@@ -67,11 +71,11 @@ public class RedBlackNode<T extends Comparable<T>> {
         return right;
     }
 
-    private void rawSetLeft(RedBlackNode<T> left) {
+    public void rawSetLeft(RedBlackNode<T> left) {
         this.left = left;
     }
 
-    private void rawSetRight(RedBlackNode<T> left) {
+    public void rawSetRight(RedBlackNode<T> right) {
         this.right = right;
     }
 
@@ -108,6 +112,11 @@ public class RedBlackNode<T extends Comparable<T>> {
     public static class NullNode extends RedBlackNode {
         public NullNode() {
             super(null, null);
+        }
+
+        @Override
+        public RedBlackTree.Color getColor() {
+            return RedBlackTree.Color.BLACK;
         }
 
         @Override
