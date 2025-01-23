@@ -124,4 +124,9 @@ public class RedBlackNode<T extends Comparable<T>> {
             return "--";
         }
     }
+
+    public static RedBlackTree.Color getColor(RedBlackNode node) {
+        if (node == null) return RedBlackTree.Color.BLACK;
+        return node.getColor();
+    }
 }

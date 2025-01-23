@@ -5,6 +5,8 @@ import BST.BinaryNode;
 import java.util.ArrayList;
 import java.util.List;
 
+import static RBT.RedBlackNode.getColor;
+
 public class RedBlackTree<T extends Comparable<T>> {
     public enum Direction {
         LEFT,
@@ -17,6 +19,20 @@ public class RedBlackTree<T extends Comparable<T>> {
     }
 
     private RedBlackNode<T> root;
+
+    private RedBlackNode<T> find(T target) {
+        RedBlackNode<T> current = root;
+        while (true) {
+            if (current.getData().equals(target)) return current;
+            if (target.compareTo(current.getData()) < 0) {
+                if (current.getLeft() == null) return null;
+                current = current.getLeft();
+            } else if (target.compareTo(current.getData()) > 0) {
+                if (current.getRight() == null) return null;
+                current = current.getRight();
+            }
+        }
+    }
 
     public void add(T value) {
         if (root == null) {
@@ -154,6 +170,60 @@ public class RedBlackTree<T extends Comparable<T>> {
         parent.setColor(Color.RED);
         grandParent.setColor(Color.BLACK);
         rightRightRotation(parent);
+    }
+
+    public void delete(T target) {
+        RedBlackNode<T> targetNode = find(target);
+        delete(targetNode);
+    }
+
+    public void delete(RedBlackNode<T> targetNode) {
+        if (targetNode == null) return;
+        if (targetNode.getNumChildren() == 0) {
+            Color targetNodeColor = getColor(targetNode);
+            if (targetNode.getAddDirection() == Direction.LEFT) {
+                targetNode.getParent().rawSetLeft(null);
+            } else {
+                targetNode.getParent().rawSetRight(null);
+            }
+            if (targetNodeColor == Color.BLACK) {
+
+            }
+        } else if (targetNode.getNumChildren() == 1) {
+            RedBlackNode<T> targetChild = targetNode.getLeft() == null? targetNode.getRight() : targetNode.getLeft();
+            if (getColor(targetNode) == Color.RED || getColor(targetChild) == Color.RED) {
+                simpleDelete(targetNode);
+            } else {
+
+            }
+        } else {
+            RedBlackNode<T> inOrderSuccessor = getInOrderSuccessor(targetNode);
+            targetNode.swapData(inOrderSuccessor);
+            targetNode.swapColor();
+            simpleDelete(inOrderSuccessor);
+        }
+    }
+
+    private RedBlackNode<T> getInOrderSuccessor(RedBlackNode<T> node) {
+        RedBlackNode<T> current = node.getRight();
+        while (true) {
+            if (current.getLeft() == null) return current;
+            current = current.getLeft();
+        }
+    }
+
+    private void fixDoubleBlack()
+
+    private void simpleDelete(RedBlackNode<T> targetNode) {
+        RedBlackNode<T> targetChild = targetNode.getLeft() == null? targetNode.getRight() : targetNode.getLeft();
+        if (targetChild.getColor() == Color.RED) {
+            targetChild.swapColor();
+        }
+        if (targetNode.getAddDirection() == Direction.LEFT) {
+            targetNode.getParent().setLeft(targetChild);
+        } else {
+            targetNode.getParent().setRight(targetChild);
+        }
     }
 
     public List<List<RedBlackNode<T>>> getLevels(RedBlackNode<T> root) {
