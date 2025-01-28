@@ -71,12 +71,22 @@ public class RedBlackNode<T extends Comparable<T>> {
         return right;
     }
 
+    public RedBlackNode<T> get(RedBlackTree.Direction direction) {
+        if (direction == RedBlackTree.Direction.LEFT) return getLeft();
+        else return getRight();
+    }
+
     public void rawSetLeft(RedBlackNode<T> left) {
         this.left = left;
     }
 
     public void rawSetRight(RedBlackNode<T> right) {
         this.right = right;
+    }
+
+    public void rawSet(RedBlackTree.Direction direction, RedBlackNode<T> newNode) {
+        if (direction == RedBlackTree.Direction.LEFT) rawSetLeft(newNode);
+        else rawSetRight(newNode);
     }
 
     public void setLeft(RedBlackNode<T> left) {
@@ -87,6 +97,11 @@ public class RedBlackNode<T extends Comparable<T>> {
     public void setRight(RedBlackNode<T> right) {
         this.right = right;
         right.setParent(this);
+    }
+
+    public void set(RedBlackTree.Direction direction, RedBlackNode<T> newNode) {
+        if (direction == RedBlackTree.Direction.LEFT) setLeft(newNode);
+        else setRight(newNode);
     }
 
     public int getNumChildren() {
@@ -128,5 +143,13 @@ public class RedBlackNode<T extends Comparable<T>> {
     public static RedBlackTree.Color getColor(RedBlackNode node) {
         if (node == null) return RedBlackTree.Color.BLACK;
         return node.getColor();
+    }
+
+    public static RedBlackNode getSibling(RedBlackNode node) {
+        if (node.getAddDirection() == RedBlackTree.Direction.LEFT) {
+            return node.getParent().getRight();
+        } else {
+            return node.getParent().getLeft();
+        }
     }
 }
