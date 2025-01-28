@@ -179,6 +179,28 @@ public class RedBlackTree<T extends Comparable<T>> {
         rightRightRotation(parent);
     }
 
+    private void deleteLeftRotate(RedBlackNode<T> x) {
+        RedBlackNode<T> nParent = x.getRight();
+        if (x == root)
+            root = nParent;
+        x.moveDown(nParent);
+        x.setRight(nParent.getLeft());
+        if (nParent.getLeft() != null)
+            nParent.getLeft().setParent(x);
+        nParent.setLeft(x);
+    }
+
+    private void deleteRightRotate(RedBlackNode<T> x) {
+        RedBlackNode<T> nParent = x.getLeft();
+        if (x == root)
+            root = nParent;
+        x.moveDown(nParent);
+        x.setLeft(nParent.getRight());
+        if (nParent.getRight() != null)
+            nParent.getRight().setParent(x);
+        nParent.setRight(x);
+    }
+
     public void delete(T target) {
         RedBlackNode<T> targetNode = find(target);
         deleteNode(targetNode);
@@ -196,11 +218,11 @@ public class RedBlackTree<T extends Comparable<T>> {
             int numChildren = current.getNumChildren();
             if (numChildren == 0) {
                 if (getColor(current) == Color.BLACK || getColor(prev) == Color.RED) {
-                    prev.swapData(current);
                     prev.rawSet(current.getAddDirection(), null);
                     prev.setColor(Color.BLACK);
                 } else {
-
+                    prev.rawSet(current.getAddDirection(), null);
+                    fixDoubleBlack(getSibling(prev));
                 }
             } else if (numChildren == 1) {
                 if (current.getLeft() != null) {
@@ -234,7 +256,39 @@ public class RedBlackTree<T extends Comparable<T>> {
     }
 
     public void fixDoubleBlack(RedBlackNode<T> sibling) {
+        if (sibling.getColor() == Color.BLACK) {
+            RedBlackNode<T> left = sibling.getLeft();
+            RedBlackNode<T> right = sibling.getRight();
+            if (getColor(left) == Color.RED || getColor(right) == Color.RED) {
+                if (sibling.getAddDirection() == Direction.LEFT) {
+                    if (getColor(left) == Color.RED) {
+                        leftLeftRotation(left);
+                    } else if (getColor(right) == Color.RED) {
+                        leftRightRotation(right);
+                    }
+                } else {
+                    if (getColor(left) == Color.RED) {
+                        rightLeftRotation(left);
+                    } else if (getColor(right) == Color.RED) {
+                        rightRightRotation(right);
+                    }
+                }
+            } else {
+                sibling.swapColor();
+                if (sibling.getParent() == root) return;
+                fixDoubleBlack(sibling.getParent());
+            }
+        } else {
+            if (sibling.getColor() == Color.RED) {
+                sibling.getParent().setColor(Color.RED);
+                sibling.setColor(Color.BLACK);
 
+                if (sibling.getAddDirection() == Direction.LEFT)
+                    deleteRightRotate(sibling.getParent());
+                else
+                    deleteLeftRotate(sibling.getParent());
+                fixDoubleBlack(sibling);
+        }
     }
 
     private RedBlackNode<T> getInOrderSuccessor(RedBlackNode<T> node) {

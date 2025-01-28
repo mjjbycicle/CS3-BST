@@ -120,6 +120,17 @@ public class RedBlackNode<T extends Comparable<T>> {
         }
     }
 
+    public void moveDown(RedBlackNode<T> nParent) {
+        if (parent != null) {
+            if (getAddDirection() == RedBlackTree.Direction.LEFT)
+                parent.setLeft(nParent);
+            else
+                parent.setRight(nParent);
+        }
+        nParent.setParent(parent);
+        setParent(nParent);
+    }
+
     public String toString() {
         return data.toString();
     }
