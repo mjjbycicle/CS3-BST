@@ -288,6 +288,7 @@ public class RedBlackTree<T extends Comparable<T>> {
                 else
                     deleteLeftRotate(sibling.getParent());
                 fixDoubleBlack(sibling);
+            }
         }
     }
 
