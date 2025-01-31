@@ -36,6 +36,13 @@ public class AVLNode<T extends Comparable<T>> {
         };
     }
 
+    public int getNumChildren() {
+        int res = 0;
+        res += getLeft() == null? 0 : 1;
+        res += getRight() == null? 0 : 1;
+        return res;
+    }
+
     public Direction getAddDirection() {
         return addDirection;
     }
@@ -113,11 +120,9 @@ public class AVLNode<T extends Comparable<T>> {
         if (node == null) return 0;
         AVLNode left = node.getLeft();
         AVLNode right = node.getRight();
-        int leftHeight = 0;
-        int rightHeight = 0;
-        if (left != null) leftHeight += getHeight(left);
-        if (right != null) rightHeight += getHeight(right);
-        return Math.max(leftHeight, rightHeight);
+        int leftHeight = getHeight(left);
+        int rightHeight = getHeight(right);
+        return Math.max(leftHeight, rightHeight) + 1;
     }
 
     private static int getDirectedBalanceFactor(AVLNode node) {
@@ -130,6 +135,21 @@ public class AVLNode<T extends Comparable<T>> {
     }
 
     public static Direction getHeavierSide(AVLNode node) {
-        return getDirectedBalanceFactor(node) < 0? Direction.RIGHT : Direction.LEFT;
+        return getDirectedBalanceFactor(node) < 0 ? Direction.RIGHT : Direction.LEFT;
+    }
+
+    public String toString() {
+        return data + "";
+    }
+
+    public static class NullNode extends AVLNode {
+        public NullNode() {
+            super(null, null, null);
+        }
+
+        @Override
+        public String toString() {
+            return "--";
+        }
     }
 }
