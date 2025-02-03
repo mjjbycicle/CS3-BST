@@ -10,12 +10,12 @@ public class AVLTreeDriver {
         for (var i : "610 753 364 497 211".split(" ")) {
             avlTree.delete(Integer.parseInt(i));
             System.out.println(avlTree);
-        }
-        for (var i : avlTree.getDisplayLevels()) {
-            for (var j : i) {
-                if (j != null) {
-                    System.out.println(AVLNode.getBalanceFactor(j));
-                    System.out.println(j);
+            for (var x : avlTree.getDisplayLevels()) {
+                for (var j : x) {
+                    if (j != null) {
+                        System.out.println(AVLNode.getBalanceFactor(j));
+                        System.out.println(j);
+                    }
                 }
             }
         }
