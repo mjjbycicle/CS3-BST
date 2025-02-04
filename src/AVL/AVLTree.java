@@ -60,44 +60,55 @@ public class AVLTree<T extends Comparable<T>> {
         return currentNode.getParent();
     }
 
-    private AVLNode<T> deleteNode(AVLNode<T> node, AVLNode<T> currentNode) {
-        if (currentNode.getData().equals(node.getData())) {
-            if (currentNode.getNumChildren() == 2) {
-                AVLNode<T> inOrderSuccessor = minValueNode(currentNode.getRight());
-                currentNode.swapData(inOrderSuccessor);
-                deleteNode(inOrderSuccessor, root);
-            } else {
-                simpleDelete(currentNode);
-            }
-        } else {
-            deleteNode(node, currentNode.get(currentNode.getNewAddDirection(node)));
-            int currentNodeBalanceFactor = AVLNode.getBalanceFactor(currentNode);
-            if (currentNodeBalanceFactor > 1) {
-                Direction currentNodeHeavierSize = AVLNode.getHeavierSide(currentNode);
-                AVLNode<T> childNode = currentNode.get(currentNodeHeavierSize);
-                Direction childNodeHeavierSide = AVLNode.getHeavierSide(childNode);
-                if (currentNodeHeavierSize == Direction.LEFT) {
-                    if (childNodeHeavierSide == Direction.LEFT) {
-                        rightRotate(currentNode);
-                    } else {
-                        leftRotate(childNode);
-                        rightRotate(currentNode);
-                    }
+    private void balance(AVLNode<T> currentNode) {
+        int currentNodeBalanceFactor = AVLNode.getBalanceFactor(currentNode);
+        if (currentNodeBalanceFactor > 1) {
+            Direction currentNodeHeavierSize = AVLNode.getHeavierSide(currentNode);
+            AVLNode<T> childNode = currentNode.get(currentNodeHeavierSize);
+            Direction childNodeHeavierSide = AVLNode.getHeavierSide(childNode);
+            if (currentNodeHeavierSize == Direction.LEFT) {
+                if (childNodeHeavierSide == Direction.LEFT) {
+                    rightRotate(currentNode);
                 } else {
-                    if (childNodeHeavierSide == Direction.RIGHT) {
-                        leftRotate(currentNode);
-                    } else {
-                        rightRotate(childNode);
-                        leftRotate(currentNode);
-                    }
+                    leftRotate(childNode);
+                    rightRotate(currentNode);
+                }
+            } else {
+                if (childNodeHeavierSide == Direction.RIGHT) {
+                    leftRotate(currentNode);
+                } else {
+                    rightRotate(childNode);
+                    leftRotate(currentNode);
                 }
             }
         }
-        return currentNode;
     }
 
-    public AVLNode<T> delete(T value) {
-        return deleteNode(new AVLNode<>(value, null, null), root);
+    private void balanceFrom(AVLNode<T> currentNode) {
+        balance(currentNode);
+        if (currentNode == root) return;
+        balanceFrom(currentNode.getParent());
+    }
+
+    private void deleteNode(AVLNode<T> node, AVLNode<T> currentNode) {
+        if (currentNode.getData().equals(node.getData())) {
+            if (currentNode.getNumChildren() == 2) {
+                AVLNode<T> inOrderSuccessor = minValueNode(currentNode.getRight());
+                AVLNode<T> inOrderSuccessorParent = inOrderSuccessor.getParent();
+                currentNode.swapData(inOrderSuccessor);
+                simpleDelete(inOrderSuccessor);
+                balanceFrom(inOrderSuccessorParent);
+            } else {
+                simpleDelete(currentNode);
+                balanceFrom(currentNode);
+            }
+        } else {
+            deleteNode(node, currentNode.get(currentNode.getNewAddDirection(node)));
+        }
+    }
+
+    public void delete(T value) {
+        deleteNode(new AVLNode<>(value, null, null), root);
     }
 
     public AVLNode<T> minValueNode(AVLNode<T> node) {
